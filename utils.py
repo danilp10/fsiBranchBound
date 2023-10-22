@@ -3,9 +3,11 @@ import math
 import operator
 import os
 import random
+import search
 import sys
 from filecmp import cmp
 from functools import reduce
+
 
 import abstract
 
@@ -591,12 +593,16 @@ Fig = {}
 
 
 class myFifoQueue(Queue):
+
     def __init__(self):
         self.queue = []
         self.index_current_node = 0
+        self.nodes_visited = 0
+        self.nodes_unvisited = 0
 
     def append(self, item):
         self.queue.append(item)
+        self.nodes_unvisited += 1
 
     def len(self):     # Devuelve la cantidad de elementos que aún no se han extraído
         return len(self.queue) - self.index_current_node
@@ -612,9 +618,59 @@ class myFifoQueue(Queue):
         # Combina los elementos existentes y los nuevos elementos
         self.queue += items
         # Ordena la cola completa en función de 'path_cost'
-        self.queue.sort(key=lambda node_x: node_x.path_cost)
+        self.queue.sort(key=lambda current_node: current_node.path_cost)
+        self.nodes_unvisited += len(items)
 
     def pop(self):
         result = self.queue[self.index_current_node]
         self.index_current_node += 1
+        self.nodes_visited += 1
+        self.nodes_unvisited -= 1
         return result
+
+    def statistics(self):
+        # Devuelve un diccionario con estadísticas de nodos visitados y no visitados
+        return {
+            "Nodes Visited without sub": self.nodes_visited,
+            "Nodes Unvisited without sub": self.nodes_unvisited
+        }
+
+
+####################################################################################################
+
+
+class myFifoQueue_with_sub(Queue):
+    def __init__(self, problem):
+        self.queue = []
+        self.index_current_node = 0
+        self.problem = problem
+        self.nodes_visited = 0
+        self.nodes_unvisited = 0
+
+    def append(self, item):
+        self.queue.append(item)
+        self.nodes_unvisited += 1
+
+    def len(self):     # Devuelve la cantidad de elementos que aún no se han extraído
+        return len(self.queue) - self.index_current_node
+
+    def extend(self, items):
+        # Combina los elementos existentes y los nuevos elementos
+        self.queue.extend(items)
+        # Ordena la cola completa en función de 'path_cost'
+        self.queue.sort(key=lambda current_node: current_node.path_cost + search.GPSProblem.h(self.problem, current_node))
+        self.nodes_unvisited += len(items)
+
+    def pop(self):
+        result = self.queue[self.index_current_node]
+        self.index_current_node += 1
+        self.nodes_visited += 1
+        self.nodes_unvisited -= 1
+        return result
+
+    def statistics(self):
+        # Devuelve un diccionario con estadísticas de nodos visitados y no visitados
+        return {
+            "Nodes Visited with sub": self.nodes_visited,
+            "Nodes Unvisited with sub": self.nodes_unvisited
+        }

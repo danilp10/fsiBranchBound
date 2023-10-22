@@ -102,10 +102,12 @@ def graph_search(problem, fringe):
     while fringe:
         node = fringe.pop()
         if problem.goal_test(node.state):
+            print(fringe.statistics())
             return node
         if node.state not in closed:
             closed[node.state] = True
             fringe.extend(node.expand(problem))
+    print(fringe.statistics())
     return None
 
 
@@ -123,6 +125,9 @@ def depth_first_graph_search(problem):
 
 def branch_and_bound_search(problem):
     return graph_search(problem, myFifoQueue())
+
+def branch_and_bound_search_with_sub(problem):
+    return graph_search(problem, myFifoQueue_with_sub(problem))
 
 ###############################################################################################
 
