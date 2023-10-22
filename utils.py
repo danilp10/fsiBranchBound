@@ -590,3 +590,31 @@ Fig = {}
 
 
 
+class myFifoQueue(Queue):
+    def __init__(self):
+        self.queue = []
+        self.index_current_node = 0
+
+    def append(self, item):
+        self.queue.append(item)
+
+    def len(self):     # Devuelve la cantidad de elementos que aún no se han extraído
+        return len(self.queue) - self.index_current_node
+
+    """
+    def extend(self, items):
+        self.queue = sorted(self.queue, key=lambda current_node: current_node.path_cost)
+        ordered_items = sorted(items, key=lambda nodo: nodo.path_cost)
+        self.queue.extend(ordered_items)
+    """
+
+    def extend(self, items):
+        # Combina los elementos existentes y los nuevos elementos
+        self.queue += items
+        # Ordena la cola completa en función de 'path_cost'
+        self.queue.sort(key=lambda node_x: node_x.path_cost)
+
+    def pop(self):
+        result = self.queue[self.index_current_node]
+        self.index_current_node += 1
+        return result
