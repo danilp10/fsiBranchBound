@@ -119,6 +119,40 @@ def depth_first_graph_search(problem):
     return graph_search(problem, Stack())
 
 
+################################################################################################
+
+def branch_and_bound(problem):
+    # Inicializa la lista abierta con el nodo inicial
+    lista_abierta = myFifoQueue()
+    lista_abierta.put(problem.initial_node)
+
+    # Variable para rastrear si se ha resuelto el problema
+    resuelto = False
+
+    while not lista_abierta.is_empty() and not resuelto:
+        # Extrae el primer elemento de la lista abierta (mejor nodo actual)
+        nodo = lista_abierta.pop()
+        estado = nodo.state
+
+        # Verifica si el estado actual es un estado objetivo
+        if problem.goal_test(estado):
+            resuelto = True
+        else:
+            # Expandir el estado y agregar los sucesores a la lista abierta
+            expansion = lista_abierta.extend(estado)
+            for sucesor in expansion:
+                lista_abierta.append(sucesor)
+
+            # Ordena la lista abierta de mejor a peor según el costo acumulado
+            lista_abierta.sort()
+
+    if resuelto:
+        # Devuelve el estado objetivo o el camino para llegar a él si es necesario
+        return estado
+    else:
+        # Informa que el objetivo no se pudo alcanzar
+        return None
+
 
 # _____________________________________________________________________________
 # The remainder of this file implements examples for the search algorithms.
@@ -262,3 +296,4 @@ class GPSProblem(Problem):
             return int(distance(locs[node.state], locs[self.goal]))
         else:
             return infinity
+

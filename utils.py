@@ -1,3 +1,15 @@
+import copy
+import math
+import operator
+import os
+import random
+import sys
+from filecmp import cmp
+from functools import reduce
+
+import abstract
+
+from search import Problem, Node
 
 #______________________________________________________________________________
 # Simple Data Structures: infinity, Dict, Struct
@@ -551,7 +563,7 @@ Fig = {}
 
 
 
-class myFifoQueque(FIFOQueue):
+"""class myFifoQueque(FIFOQueue):
 
     visited = 0
 
@@ -574,25 +586,45 @@ class myFifoQueque(FIFOQueue):
 
     @Override
     def extend(self):
+"""
 
-    def branch_and_bound(initial_state):
-        best_solution = None
-        queue = myFifoQueque({(initial_state, calculate_bound(initial_state)): 0})
+class myFifoQueue(FIFOQueue):
+    def init(self):
+        self.queue = []
 
-        while queue:
-            current_state, current_bound = queue.pop()
+    def append(self, node):
+        self.queue.append(node)
 
-            if current_bound < best_solution:
-                # Poda si el límite es peor que la mejor solución encontrada hasta ahora
-                continue
+    def pop(self):
+        return self.queue.pop(0)
 
-            if is_solution(current_state):
-                # Actualizar la mejor solución si se encuentra una solución mejor
-                best_solution = current_state
+    def extend(self, state):
+        successors = []
+        for operation in self.operations:
+            if self.is_applicable(operation, state):
+                new_state = self.apply(operation, state)
+                successors.append(new_state)
+        return successors
 
-            child_states = generate_child_states(current_state)
-            for child_state in child_states:
-                child_bound = calculate_bound(child_state)
-                queue.append((child_state, child_bound))
+    def len(self):
+        return len(self.queue)
 
-        return best_solution
+    def is_applicable(self, operation, state):
+        # Verifica si la operación es aplicable al estado actual.
+        # Debe verificar las precondiciones de la operación.
+        if operation and state:
+            return True
+        else:
+            return False
+
+    def apply(self, operation, state):
+        # Aplica la operación al estado actual y devuelve el nuevo estado.
+        # Actualiza el estado teniendo en cuenta los efectos de la operación.
+        current_city, accumulated_cost = state
+        new_city, add_cost = operation
+
+        # Aplicar la operación significa cambiar la ciudad actual.
+        new_state = (new_city, accumulated_cost + add_cost)  # Puedes actualizar los costes.
+        return new_state
+
+
