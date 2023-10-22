@@ -124,15 +124,15 @@ def depth_first_graph_search(problem):
 def branch_and_bound(problem):
     # Inicializa la lista abierta con el nodo inicial
     lista_abierta = myFifoQueue()
-    lista_abierta.put(problem.initial_node)
+    lista_abierta.append(problem.initial)
 
     # Variable para rastrear si se ha resuelto el problema
     resuelto = False
 
     while not lista_abierta.is_empty() and not resuelto:
         # Extrae el primer elemento de la lista abierta (mejor nodo actual)
-        nodo = lista_abierta.pop()
-        estado = nodo.state
+        estado = lista_abierta.pop()
+        #estado = nodo.state
 
         # Verifica si el estado actual es un estado objetivo
         if problem.goal_test(estado):
@@ -297,3 +297,45 @@ class GPSProblem(Problem):
         else:
             return infinity
 
+
+class myFifoQueue(FIFOQueue):
+    def __init__(self):
+        self.queue = []
+
+    def append(self, node):
+        self.queue.append(node)
+
+    def pop(self):
+        return self.queue.pop(0)
+
+    def extend(self, state):
+        successors = []
+        operation = []
+        #for operation in self.operations:
+        if self.is_applicable(operation, state):
+            new_state = self.apply(operation, state)
+            successors.append(new_state)
+        return successors
+
+    def len(self):
+        return len(self.queue)
+
+    def is_applicable(self, operation, state):
+        # Verifica si la operación es aplicable al estado actual.
+        # Debe verificar las precondiciones de la operación.
+        return True
+
+    def apply(self, operation, state):
+        # Aplica la operación al estado actual y devuelve el nuevo estado.
+        # Actualiza el estado teniendo en cuenta los efectos de la operación.
+        current_city, accumulated_cost = state
+        new_city, add_cost = operation
+
+        # Aplicar la operación significa cambiar la ciudad actual.
+        new_state = (new_city, accumulated_cost + add_cost)  # Puedes actualizar los costes.
+        return new_state
+
+    def is_empty(self):
+        if self.queue.__len__() == 0:
+            return True
+        return False

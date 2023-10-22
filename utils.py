@@ -9,7 +9,7 @@ from functools import reduce
 
 import abstract
 
-from search import Problem, Node
+#from search import Problem, Node
 
 #______________________________________________________________________________
 # Simple Data Structures: infinity, Dict, Struct
@@ -588,43 +588,5 @@ Fig = {}
     def extend(self):
 """
 
-class myFifoQueue(FIFOQueue):
-    def init(self):
-        self.queue = []
-
-    def append(self, node):
-        self.queue.append(node)
-
-    def pop(self):
-        return self.queue.pop(0)
-
-    def extend(self, state):
-        successors = []
-        for operation in self.operations:
-            if self.is_applicable(operation, state):
-                new_state = self.apply(operation, state)
-                successors.append(new_state)
-        return successors
-
-    def len(self):
-        return len(self.queue)
-
-    def is_applicable(self, operation, state):
-        # Verifica si la operación es aplicable al estado actual.
-        # Debe verificar las precondiciones de la operación.
-        if operation and state:
-            return True
-        else:
-            return False
-
-    def apply(self, operation, state):
-        # Aplica la operación al estado actual y devuelve el nuevo estado.
-        # Actualiza el estado teniendo en cuenta los efectos de la operación.
-        current_city, accumulated_cost = state
-        new_city, add_cost = operation
-
-        # Aplicar la operación significa cambiar la ciudad actual.
-        new_state = (new_city, accumulated_cost + add_cost)  # Puedes actualizar los costes.
-        return new_state
 
 
