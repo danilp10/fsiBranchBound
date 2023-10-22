@@ -121,6 +121,10 @@ def depth_first_graph_search(problem):
 
 ################################################################################################
 
+def branch_and_bound_search(problem):
+    return graph_search(problem, PriorityQueue())
+
+
 def branch_and_bound(problem):
     # Inicializa la lista abierta con el nodo inicial
     lista_abierta = myFifoQueue()
@@ -310,11 +314,16 @@ class myFifoQueue(FIFOQueue):
 
     def extend(self, state):
         successors = []
-        operation = []
-        #for operation in self.operations:
-        if self.is_applicable(operation, state):
-            new_state = self.apply(operation, state)
-            successors.append(new_state)
+        # Obtén las ciudades vecinas del estado actual
+        current_city,  = state  # Desempaca el estado actual
+        neighbors = self.graph.get(current_city)
+
+        if neighbors:
+            for new_city, cost in neighbors.items():
+                # Genera los sucesores agregando ciudades vecinas al estado actual
+                new_state = (new_city, cost)
+                successors.append(new_state)
+
         return successors
 
     def len(self):
@@ -339,3 +348,25 @@ class myFifoQueue(FIFOQueue):
         if self.queue.__len__() == 0:
             return True
         return False
+
+
+class PriorityQueue(Queue):
+    def __init__(self):
+        self.queue = []
+        self.start = 0
+
+    def append(self, item):
+        self.queue.append(item)
+
+    def len(self):
+        return len(self.queue) - self.start
+
+    def extend(self, items):
+        self.queue = sorted(self.queue, key=lambda node_x: node_x.path_cost)
+        ordered_items = sorted(items, key=lambda nodo: nodo.path_cost)
+        self.queue.extend(ordered_items)
+
+    def pop(self):
+        result = self.queue[self.start]
+        self.start += 1
+        return result
