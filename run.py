@@ -9,7 +9,8 @@ ab = search.GPSProblem('A', 'B'
 #print(search.depth_first_graph_search(ab).path())
 
 print(search.branch_and_bound_search(ab).path())
-
+# Result:
+# [<Node B>, <Node P>, <Node R>, <Node S>, <Node A>]
 
 
 # Result:

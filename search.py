@@ -122,40 +122,9 @@ def depth_first_graph_search(problem):
 ################################################################################################
 
 def branch_and_bound_search(problem):
-    return graph_search(problem, PriorityQueue())
+    return graph_search(problem, myFifoQueue())
 
-
-def branch_and_bound(problem):
-    # Inicializa la lista abierta con el nodo inicial
-    lista_abierta = myFifoQueue()
-    lista_abierta.append(problem.initial)
-
-    # Variable para rastrear si se ha resuelto el problema
-    resuelto = False
-
-    while not lista_abierta.is_empty() and not resuelto:
-        # Extrae el primer elemento de la lista abierta (mejor nodo actual)
-        estado = lista_abierta.pop()
-        #estado = nodo.state
-
-        # Verifica si el estado actual es un estado objetivo
-        if problem.goal_test(estado):
-            resuelto = True
-        else:
-            # Expandir el estado y agregar los sucesores a la lista abierta
-            expansion = lista_abierta.extend(estado)
-            for sucesor in expansion:
-                lista_abierta.append(sucesor)
-
-            # Ordena la lista abierta de mejor a peor según el costo acumulado
-            lista_abierta.sort()
-
-    if resuelto:
-        # Devuelve el estado objetivo o el camino para llegar a él si es necesario
-        return estado
-    else:
-        # Informa que el objetivo no se pudo alcanzar
-        return None
+###############################################################################################
 
 
 # _____________________________________________________________________________
@@ -302,71 +271,31 @@ class GPSProblem(Problem):
             return infinity
 
 
-class myFifoQueue(FIFOQueue):
+class myFifoQueue(Queue):
     def __init__(self):
         self.queue = []
-
-    def append(self, node):
-        self.queue.append(node)
-
-    def pop(self):
-        return self.queue.pop(0)
-
-    def extend(self, state):
-        successors = []
-        # Obtén las ciudades vecinas del estado actual
-        current_city,  = state  # Desempaca el estado actual
-        neighbors = self.graph.get(current_city)
-
-        if neighbors:
-            for new_city, cost in neighbors.items():
-                # Genera los sucesores agregando ciudades vecinas al estado actual
-                new_state = (new_city, cost)
-                successors.append(new_state)
-
-        return successors
-
-    def len(self):
-        return len(self.queue)
-
-    def is_applicable(self, operation, state):
-        # Verifica si la operación es aplicable al estado actual.
-        # Debe verificar las precondiciones de la operación.
-        return True
-
-    def apply(self, operation, state):
-        # Aplica la operación al estado actual y devuelve el nuevo estado.
-        # Actualiza el estado teniendo en cuenta los efectos de la operación.
-        current_city, accumulated_cost = state
-        new_city, add_cost = operation
-
-        # Aplicar la operación significa cambiar la ciudad actual.
-        new_state = (new_city, accumulated_cost + add_cost)  # Puedes actualizar los costes.
-        return new_state
-
-    def is_empty(self):
-        if self.queue.__len__() == 0:
-            return True
-        return False
-
-
-class PriorityQueue(Queue):
-    def __init__(self):
-        self.queue = []
-        self.start = 0
+        self.index_current_node = 0
 
     def append(self, item):
         self.queue.append(item)
 
-    def len(self):
-        return len(self.queue) - self.start
+    def len(self):     # Devuelve la cantidad de elementos que aún no se han extraído
+        return len(self.queue) - self.index_current_node
 
+    """
     def extend(self, items):
-        self.queue = sorted(self.queue, key=lambda node_x: node_x.path_cost)
+        self.queue = sorted(self.queue, key=lambda current_node: current_node.path_cost)
         ordered_items = sorted(items, key=lambda nodo: nodo.path_cost)
         self.queue.extend(ordered_items)
+    """
+
+    def extend(self, items):
+        # Combina los elementos existentes y los nuevos elementos
+        self.queue += items
+        # Ordena la cola completa en función de 'path_cost'
+        self.queue.sort(key=lambda node_x: node_x.path_cost)
 
     def pop(self):
-        result = self.queue[self.start]
-        self.start += 1
+        result = self.queue[self.index_current_node]
+        self.index_current_node += 1
         return result
