@@ -597,59 +597,50 @@ class myFifoQueue(Queue):
     def __init__(self):
         self.queue = []
         self.index_current_node = 0
-        self.nodes_visited = 0
-        self.nodes_unvisited = 0
+        self.closed_set = set()
 
     def append(self, item):
         self.queue.append(item)
-        self.nodes_unvisited += 1
 
     def len(self):     # Devuelve la cantidad de elementos que aún no se han extraído
         return len(self.queue) - self.index_current_node
 
     """
     def extend(self, items):
+        new_items = [item for item in items if item not in self.closed_set]
         self.queue = sorted(self.queue, key=lambda current_node: current_node.path_cost)
         ordered_items = sorted(items, key=lambda nodo: nodo.path_cost)
         self.queue.extend(ordered_items)
+        print(self.queue)  
     """
 
     def extend(self, items):
+        # new_items = [item for item in items if not item.state]
         # Combina los elementos existentes y los nuevos elementos
-        self.queue += items
+        self.queue.extend(items)
         # Ordena la cola completa en función de 'path_cost'
         self.queue.sort(key=lambda current_node: current_node.path_cost)
-        self.nodes_unvisited += len(items)
 
     def pop(self):
         result = self.queue[self.index_current_node]
         self.index_current_node += 1
-        self.nodes_visited += 1
-        self.nodes_unvisited -= 1
+        if not result.state:
+            # self.closed_set.add(result)
+            self.queue = self.queue[self.index_current_node:]
+            self.index_current_node = 0
         return result
 
-    def statistics(self):
-        # Devuelve un diccionario con estadísticas de nodos visitados y no visitados
-        return {
-            "Nodes Visited without sub": self.nodes_visited,
-            "Nodes Unvisited without sub": self.nodes_unvisited
-        }
-
-
 ####################################################################################################
-
 
 class myFifoQueue_with_sub(Queue):
     def __init__(self, problem):
         self.queue = []
         self.index_current_node = 0
         self.problem = problem
-        self.nodes_visited = 0
-        self.nodes_unvisited = 0
+        self.closed_list = []
 
     def append(self, item):
         self.queue.append(item)
-        self.nodes_unvisited += 1
 
     def len(self):     # Devuelve la cantidad de elementos que aún no se han extraído
         return len(self.queue) - self.index_current_node
@@ -659,18 +650,12 @@ class myFifoQueue_with_sub(Queue):
         self.queue.extend(items)
         # Ordena la cola completa en función de 'path_cost'
         self.queue.sort(key=lambda current_node: current_node.path_cost + search.GPSProblem.h(self.problem, current_node))
-        self.nodes_unvisited += len(items)
 
     def pop(self):
         result = self.queue[self.index_current_node]
         self.index_current_node += 1
-        self.nodes_visited += 1
-        self.nodes_unvisited -= 1
+        if not result.state:
+            # self.closed_set.add(result)
+            self.queue = self.queue[self.index_current_node:]
+            self.index_current_node = 0
         return result
-
-    def statistics(self):
-        # Devuelve un diccionario con estadísticas de nodos visitados y no visitados
-        return {
-            "Nodes Visited with sub": self.nodes_visited,
-            "Nodes Unvisited with sub": self.nodes_unvisited
-        }

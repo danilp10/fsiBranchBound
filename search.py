@@ -7,7 +7,6 @@ functions."""
 
 from utils import *
 import random
-import sys
 
 
 # ______________________________________________________________________________
@@ -98,16 +97,22 @@ def graph_search(problem, fringe):
     The argument fringe should be an empty queue.
     If two paths reach a state, only use the best one. [Fig. 3.18]"""
     closed = {}
+    nodes_visited = 0
+    nodes_unvisited = 0
     fringe.append(Node(problem.initial))
     while fringe:
         node = fringe.pop()
+        nodes_visited += 1
         if problem.goal_test(node.state):
-            print(fringe.statistics())
+            print("Nodes Visited:", nodes_visited)
+            print("Nodes Unvisited:", nodes_unvisited)
             return node
         if node.state not in closed:
             closed[node.state] = True
             fringe.extend(node.expand(problem))
-    print(fringe.statistics())
+            nodes_unvisited += len(node.expand(problem))
+    print("Nodes Visited:", nodes_visited)
+    print("Nodes Unvisited:", nodes_unvisited)
     return None
 
 
@@ -125,6 +130,7 @@ def depth_first_graph_search(problem):
 
 def branch_and_bound_search(problem):
     return graph_search(problem, myFifoQueue())
+
 
 def branch_and_bound_search_with_sub(problem):
     return graph_search(problem, myFifoQueue_with_sub(problem))
