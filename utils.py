@@ -11,9 +11,9 @@ from functools import reduce
 
 import abstract
 
-#from search import Problem, Node
+# from search import Problem, Node
 
-#______________________________________________________________________________
+# ______________________________________________________________________________
 # Simple Data Structures: infinity, Dict, Struct
 
 infinity = 1.0e400
@@ -75,7 +75,7 @@ def update(x, **entries):
     return x
 
 
-#______________________________________________________________________________
+# ______________________________________________________________________________
 # Functions on Sequences (mostly inspired by Common Lisp)
 # NOTE: Sequence functions (count_if, find_if, every, some) take function
 # argument first (like reduce, filter, and map).
@@ -180,7 +180,7 @@ def argmin(seq, fn):
     >>> argmin(['one', 'to', 'three'], len)
     'to'
     """
-    best = seq[0];
+    best = seq[0]
     best_score = fn(best)
     for x in seq:
         x_score = fn(x)
@@ -207,12 +207,12 @@ def argmin_list(seq, fn):
 def argmin_random_tie(seq, fn):
     """Return an element with lowest fn(seq[i]) score; break ties at random.
     Thus, for all s,f: argmin_random_tie(s, f) in argmin_list(s, f)"""
-    best_score = fn(seq[0]);
+    best_score = fn(seq[0])
     n = 0
     for x in seq:
         x_score = fn(x)
         if x_score < best_score:
-            best, best_score = x, x_score;
+            best, best_score = x, x_score
             n = 1
         elif x_score == best_score:
             n += 1
@@ -558,11 +558,9 @@ class FIFOQueue(Queue):
         return e
 
 
-
 ## Fig: The idea is we can define things like Fig[3,10] later.
 ## Alas, it is Fig[3,10] not Fig[3.10], because that would be the same as Fig[3.1]
 Fig = {}
-
 
 
 """class myFifoQueque(FIFOQueue):
@@ -591,10 +589,10 @@ Fig = {}
 """
 
 
-
 class myFifoQueue(Queue):
 
     def __init__(self):
+        super().__init__()
         self.queue = []
         self.index_current_node = 0
         self.closed_set = set()
@@ -605,39 +603,29 @@ class myFifoQueue(Queue):
     def len(self):     # Devuelve la cantidad de elementos que aún no se han extraído
         return len(self.queue) - self.index_current_node
 
-    """
     def extend(self, items):
-        new_items = [item for item in items if item not in self.closed_set]
-        self.queue = sorted(self.queue, key=lambda current_node: current_node.path_cost)
-        ordered_items = sorted(items, key=lambda nodo: nodo.path_cost)
-        self.queue.extend(ordered_items)
-        print(self.queue)  
-    """
-
-    def extend(self, items):
-        # new_items = [item for item in items if not item.state]
-        # Combina los elementos existentes y los nuevos elementos
         self.queue.extend(items)
-        # Ordena la cola completa en función de 'path_cost'
-        self.queue.sort(key=lambda current_node: current_node.path_cost)
+        self.queue = sorted(self.queue, key=lambda nodes: nodes.path_cost)
+        # print(self.queue)
 
     def pop(self):
-        result = self.queue[self.index_current_node]
-        self.index_current_node += 1
-        if not result.state:
-            # self.closed_set.add(result)
-            self.queue = self.queue[self.index_current_node:]
-            self.index_current_node = 0
-        return result
+        while self.queue:
+            node = self.queue.pop(0)
+            if node.state not in self.closed_set:
+                self.closed_set.add(node.state)
+                return node
+        return None
 
 ####################################################################################################
 
+
 class myFifoQueue_with_sub(Queue):
     def __init__(self, problem):
+        super().__init__()
         self.queue = []
         self.index_current_node = 0
         self.problem = problem
-        self.closed_list = []
+        self.closed_set = set()
 
     def append(self, item):
         self.queue.append(item)
@@ -650,12 +638,12 @@ class myFifoQueue_with_sub(Queue):
         self.queue.extend(items)
         # Ordena la cola completa en función de 'path_cost'
         self.queue.sort(key=lambda current_node: current_node.path_cost + search.GPSProblem.h(self.problem, current_node))
+        print(self.queue)
 
     def pop(self):
-        result = self.queue[self.index_current_node]
-        self.index_current_node += 1
-        if not result.state:
-            # self.closed_set.add(result)
-            self.queue = self.queue[self.index_current_node:]
-            self.index_current_node = 0
-        return result
+        while self.queue:
+            node = self.queue.pop(0)
+            if node.state not in self.closed_set:
+                self.closed_set.add(node.state)
+                return node
+        return None

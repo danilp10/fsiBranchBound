@@ -3,8 +3,7 @@
 The way to use this code is to subclass Problem to create a class of problems,
 then create problem instances and solve them with calls to the various search
 functions."""
-
-
+# import utils
 from utils import *
 import random
 
@@ -88,9 +87,9 @@ class Node:
                      problem.path_cost(self.path_cost, self.state, act, next))
                 for (act, next) in problem.successor(self.state)]
 
-
 # ______________________________________________________________________________
-## Uninformed Search algorithms
+# Uninformed Search algorithms
+
 
 def graph_search(problem, fringe):
     """Search through the successors of a problem to find a goal.
@@ -103,14 +102,16 @@ def graph_search(problem, fringe):
     while fringe:
         node = fringe.pop()
         nodes_visited += 1
+        nodes_unvisited -= 1
         if problem.goal_test(node.state):
             print("Nodes Visited:", nodes_visited)
             print("Nodes Unvisited:", nodes_unvisited)
             return node
         if node.state not in closed:
             closed[node.state] = True
-            fringe.extend(node.expand(problem))
-            nodes_unvisited += len(node.expand(problem))
+            successors = [child for child in node.expand(problem) if child.state not in closed]
+            fringe.extend(successors)
+            nodes_unvisited += len(successors)
     print("Nodes Visited:", nodes_visited)
     print("Nodes Unvisited:", nodes_unvisited)
     return None
