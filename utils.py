@@ -242,7 +242,7 @@ def argmax_random_tie(seq, fn):
     return argmin_random_tie(seq, lambda x: -fn(x))
 
 
-#______________________________________________________________________________
+# ______________________________________________________________________________
 # Statistical and mathematical functions
 
 def histogram(values, mode=0, bin_function=None):
